@@ -1,0 +1,27 @@
+{
+  "name": "plugin-agent-autoresponse",
+  "version": "64.0.0",
+  "private": true,
+  "description": "Enables your agents to send canned responses when chatting with a customer",
+  "scripts": {
+    "postinstall": "flex-plugin pre-script-check"
+  },
+  "dependencies": {
+    "@twilio/flex-plugin-scripts": "5.0.2",
+    "antd": "^4.21.5",
+    "flex-plugin": "^4.3.4",
+    "html-react-parser": "^1.4.5",
+    "react": "^16.7.0-alpha.2",
+    "react-contenteditable": "^3.3.6",
+    "react-dom": "^16.7.0-alpha.2",
+    "react-emotion": "9.2.12",
+    "react-highlight-words": "^0.17.0",
+    "react-phone-input-2": "^2.15.1",
+    "react-tooltip": "^4.2.21",
+    "twilio-flex-token-validator": "^1.5.6"
+  },
+  "devDependencies": {
+    "@twilio/flex-ui": "^1",
+    "react-test-renderer": "16.5.2"
+  }
+}
