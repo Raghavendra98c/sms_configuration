@@ -150,6 +150,9 @@ export default class SmsModal extends React.PureComponent {
     // this.setState({ enableContent: true })
   }
 
+formatDate(nowDate) {
+    return nowDate.getDate() +"/"+ (nowDate.getMonth() + 1) + '/'+ nowDate.getFullYear();
+}
 
 
   sendSms(s_value, phone_number) {
@@ -177,15 +180,72 @@ export default class SmsModal extends React.PureComponent {
     };
 
     axios(config)
-      .then(response => {
-        console.log(response)
-        if (response.status === 200) {
+      .then( async(response) => {
+        console.log(response ,"Response:::::::::::::")
+        if (response.status === 200 || response.status === 201) {
           this.openNotification("SMS sent successfully", "bottomRight")
           this.setState({
             selectedmsg: "",
             phone_number: "+63",//for philiphines only this needs to be remove if sms will be for countries philiphile as welll.
             charcount: 480
           })
+          const json = {
+            
+            sid:this.props.workerSid
+          }
+          const option = {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(json),
+          };
+          var attr = await fetch('https://skill-filter-4991-dev.twil.io/fetch-worker', option).then((e)=>{return e.json()})
+          console.log(attr,"**************************************")
+          var currentTime = new Date();
+          currentTime.setUTCHours(currentTime.getUTCHours()+8)
+          var previousUpdated = new Date(attr.lastUpdatedMessage)
+       
+          console.log(this.formatDate(currentTime),this.formatDate(previousUpdated),"Date:::::::::::::::")
+          if(attr.messageCount!==undefined)
+      {
+        if(this.formatDate(currentTime) == this.formatDate(previousUpdated)){
+          attr.messageCount = attr.messageCount+1
+          attr.lastUpdatedMessage=currentTime
+        }
+        else{
+          attr.messageCount = 1
+          attr.lastUpdatedMessage=currentTime
+        }
+         
+      }
+      else 
+      {
+          attr.messageCount = 1
+          attr.lastUpdatedMessage=currentTime
+      }
+      const body = {
+        sid: this.props.workerSid,
+        attributes: attr
+      }
+      const options = {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body),
+      };
+      await fetch('https://skill-filter-4991-dev.twil.io/update-attributes', options).then((response) => {
+        return response;  
+      }).then((data) => {
+          console.log(data,"---------------------------")
+          return data.json();
+      }).then((result)=>{
+      }).catch((error) => {
+          console.log(error)
+      });
+
+    
         }
         this.setState({ selectedmsg: '' })
       }).catch(error => {
@@ -207,7 +267,7 @@ export default class SmsModal extends React.PureComponent {
   };
 
   handleChangeText = (ev) => {
-    console.log(ev.target.value, "EVENT :::: ");
+    console.log(ev.target.value, "EVENT :::: "); 
     console.log(ev, "EVENT :::: ");
     if (ev.target.value.length <= this.state.maxlen) {
       this.setState({ selectedmsg: ev.target.value })
